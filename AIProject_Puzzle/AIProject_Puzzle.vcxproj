@@ -149,7 +149,6 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="MyMatrix.c" />
     <ClCompile Include="myQueue.c" />
-    <ClCompile Include="test.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyMatrix.h" />
