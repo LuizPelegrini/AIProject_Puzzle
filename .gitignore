@@ -1,0 +1,7 @@
+.vs/
+x64/
+Debug/
+AIProject_Puzzle/x64/Debug/
+AIProject_Puzzle/Debug/
+*.sdf
+!.gitignore
