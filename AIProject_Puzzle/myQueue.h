@@ -19,7 +19,7 @@ typedef struct state {
 	Action action;
 	struct state *parent;
 	struct state *next;
-	int custo;
+	int cost;
 }State;
 
 typedef struct queue {
@@ -28,6 +28,7 @@ typedef struct queue {
 }Queue;
 
 Queue *myQueue;
+Queue *myTree;
 Mode myMode = BFS;
 State finalState;
 

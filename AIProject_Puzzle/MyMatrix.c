@@ -96,9 +96,22 @@ void FindZeroPosition(int **matrix) {
 }
 
 int CanMoveUp() {
+	
 	if (positionY - 1 < 0)
 		return 0;
+
 	return 1;
+}
+
+int** MoveUp(int **matrix) {
+	int **newMatrix;
+
+	newMatrix = matrix;
+
+	newMatrix[positionY][positionX] = newMatrix[positionY - 1][positionX];
+	newMatrix[positionY - 1][positionX] = 0;
+
+	return newMatrix;
 }
 
 int CanMoveDown() {

@@ -1,5 +1,6 @@
 #ifndef MYMATRIX_H
 #define MYMATRIX_H
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 

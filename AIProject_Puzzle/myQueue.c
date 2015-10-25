@@ -3,12 +3,27 @@
 int CreateQueue() {
 
 	SetFinalState();
-	
-	if (!(myQueue = (Queue*)malloc(sizeof(Queue))))
+
+	if (!(myQueue = (Queue*)malloc(sizeof(Queue)))){
+		printf("%s\n", "Creation of the Queue has failed!");
 		return 0;
-	
+	}
+
 	myQueue->numberOfElements = 0;
 	myQueue->firstState = NULL;
+
+	return 1;
+}
+
+int CreateTree() {
+
+	if (!(myTree = (Queue*)malloc(sizeof(Queue)))) {
+		printf("%s\n", "Creation of the Tree has failed!");
+		return 0;
+	}
+
+	myTree->numberOfElements = 0;
+	myTree->firstState = NULL;
 
 	return 1;
 }
@@ -16,8 +31,7 @@ int CreateQueue() {
 // First Stage has no parent, param = NULL
 void CreateFirstState() {
 	State *state;
-	Action action = NONE;
-	state = CreateNewState(NULL);
+	state = CreateNewState(NULL, NONE);
 }
 
 int IsEmpty() {
@@ -59,58 +73,100 @@ int Insert(State *state, int mode) {
 	}*/
 }
 
-State *CreateNewState(State *parent) {
+State *CreateNewState(State *parent, Action action) {
 	
 	// If action is NONE, then it is the first generated state ---> no parent
 	if (parent == NULL)
 	{
-		State *state;
-		if (!(state = (State*)malloc(sizeof(State))))
+		State *newState;
+		if (!(newState = (State*)malloc(sizeof(State))))
 			return NULL;
 
-		state->parent = NULL;
-		state->matrix = CreateRandomMatrix(3);
-		state->matrixToString = TurnMatrixIntoString(state->matrix);
-		state->custo = 0;
-		state->action = NONE;
-		state->next = NULL;
+		newState->parent = NULL;
+		newState->matrix = CreateRandomMatrix(3);
+		newState->matrixToString = TurnMatrixIntoString(newState->matrix);
+		newState->cost = 0;
+		newState->action = action;
+		newState->next = NULL;
 
-		Insert(state, myMode);
+		Insert(newState, myMode);
 
-		return state;
+		return newState;
 	}
 	else{
-		FindZeroPosition(parent->matrix);
-		if (CanMoveUp()) {
-			// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< RIGHT HERE MAN!
+		State *newState;
+		if (!(newState = (State*)malloc(sizeof(State))))
+			return NULL;
+		
+		switch (action) {
+			case UP:
+				newState->parent = parent;
+				newState->action = action;
+				newState->cost = parent->cost + 1;
+				newState->matrix = MoveUp(parent->matrix);
+				newState->matrixToString = TurnMatrixIntoString(newState->matrix);
+				
+				// Is it the first element I am trying to insert?
+				if (IsEmpty())
+					newState->next = NULL;
+
+				// If not, just insert it normally
+				Insert(newState, myMode);
+				break;
+			case DOWN:
+				break;
+			case LEFT:
+				break;
+			case RIGHT:
+				break;
+			default:
+				printf("%s\n", "INVALID ACTION!");
+				break;
 		}
 	}
 
 }
 
-int PopAndCheck() {
-	State state;
+int Pop() {
 	State *currentState;
 
-	currentState = myQueue->firstState;
-	state = *currentState;
+	if (IsEmpty()) {
+		printf("%s", "The queue is empty, Pop operation cannot be done!");
+		return 0;
+	}
 
-	if (Verify(currentState)) {
+	currentState = myQueue->firstState;
+
+	// Is it the final state?
+	if (IsFinalState(currentState)) {
 		ShowResults();
 		return 1;
 	}
 	else {
-		CreateNewState(currentState);
-		return 0;
+		// Low the number of elements in the queue
+		myQueue->numberOfElements--;
+
+		// Find the position where the number zero is
+		FindZeroPosition(currentState->matrix);
+
+		// Is it possible to change the numbers within the matrix?
+		if (CanMoveUp()) {
+			CreateNewState(currentState, UP);
+		}
+		if (CanMoveDown()) {
+			CreateNewState(currentState, DOWN);
+		}
 	}
 
+	// Take out from the queue
 	myQueue->firstState = currentState->next;
 
 	free(currentState);
 
+	return 0;
 }
 
-int Verify(State *state) {
+int IsFinalState(State *state) {
 	if (!strcmp(state->matrixToString, finalState.matrixToString))
 		return 1;
 	return 0;
@@ -120,7 +176,7 @@ int Verify(State *state) {
 // Check this for later setup <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void SetFinalState(){
 	finalState.action = NONE;
-	finalState.custo = -1;
+	finalState.cost = -1;
 	finalState.matrixToString = "123456780";
 }
 
