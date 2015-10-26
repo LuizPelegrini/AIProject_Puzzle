@@ -15,7 +15,7 @@ typedef enum action {
 
 typedef struct state {
 	int **matrix;
-	char *matrixToString;
+	char *matrixString;
 	Action action;
 	struct state *parent;
 	struct state *next;
@@ -28,14 +28,17 @@ typedef struct queue {
 }Queue;
 
 Queue *myQueue;
-Queue *myTree;
-Mode myMode = BFS;
+Mode myMode;
 State finalState;
 
-int CreateQueue();
-int Insert(Queue *queue);
-int IsEmpty(Queue *queue);
-State* CreateNewState(State* parent);
-void CreateFirstState();
 
+int CreateQueue();
+int CreateFirstState();
+int IsEmpty();
+void Insert(State *state, Mode mode);
+int CreateNewState(State* parent, Action action);
+int Pop();
+int IsFinalState(State *state);
+void SetFinalState();
+void ShowResults();
 #endif

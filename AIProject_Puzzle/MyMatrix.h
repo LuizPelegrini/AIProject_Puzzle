@@ -11,6 +11,7 @@ int positionX;
 int positionY;
 
 int **CreateRandomMatrix(int matrixSize);
+int **CreateDesiredMatrix(int matrixSize);
 void InitiliazeNumberVector(int arraySize);
 int GetRandomNumber();
 void RemoveAt(int index);
@@ -20,5 +21,9 @@ int CanMoveUp();
 int CanMoveDown();
 int CanMoveLeft();
 int CanMoveRight();
-
+int** MoveUp(int** matrix);
+int** MoveDown(int** matrix);
+int** MoveLeft(int** matrix);
+int** MoveRight(int** matrix);
+void ShowMatrix(int** matrix);
 #endif

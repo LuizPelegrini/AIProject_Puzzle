@@ -5,7 +5,6 @@ int **CreateRandomMatrix(int size) {
 	int i, j;
 	
 	matrixSize = size;
-	
 	myMatrix = (int**)malloc(size*sizeof(int*));
 	
 	InitiliazeNumberVector(size);
@@ -19,6 +18,8 @@ int **CreateRandomMatrix(int size) {
 		}
 	}
 
+	ShowMatrix(myMatrix);
+	
 	return myMatrix;
 }
 
@@ -59,7 +60,7 @@ void RemoveAt(int index) {
 
 char* TurnMatrixIntoString(int **matrix) {
 	char *string;
-	int i, j, k;
+	int i, j, k = 0;
 	int n = matrixSize*matrixSize;
 
 	string = (char*)malloc(n*sizeof(char));
@@ -103,19 +104,9 @@ int CanMoveUp() {
 	return 1;
 }
 
-int** MoveUp(int **matrix) {
-	int **newMatrix;
-
-	newMatrix = matrix;
-
-	newMatrix[positionY][positionX] = newMatrix[positionY - 1][positionX];
-	newMatrix[positionY - 1][positionX] = 0;
-
-	return newMatrix;
-}
 
 int CanMoveDown() {
-	if (positionY + 1 > matrixSize)
+	if (positionY + 1 >= matrixSize)
 		return 0;
 	return 1;
 }
@@ -127,7 +118,128 @@ int CanMoveLeft() {
 }
 
 int CanMoveRight() {
-	if (positionX + 1 > matrixSize)
+	if (positionX + 1 >= matrixSize)
 		return 0;
 	return 1;
+}
+
+int** MoveUp(int **matrix) {
+	int **newMatrix;
+	int i, j;
+
+	// Need to create a copy of the parent matrix
+	newMatrix = (int**)malloc(matrixSize*sizeof(int*));
+	for (i = 0; i < matrixSize; i++)
+		newMatrix[i] = (int*)malloc(sizeof(int));
+
+	for (i = 0; i < matrixSize; i++)
+		for (j = 0; j < matrixSize; j++)
+			newMatrix[i][j] = matrix[i][j];
+
+	// Move '0' upwards
+	newMatrix[positionY][positionX] = newMatrix[positionY - 1][positionX];
+	newMatrix[positionY - 1][positionX] = 0;
+
+	return newMatrix;
+}
+
+int** MoveDown(int **matrix) {
+	int **newMatrix;
+	int i, j;
+
+	// Need to create a copy of the parent matrix
+	newMatrix = (int**)malloc(matrixSize*sizeof(int*));
+	for (i = 0; i < matrixSize; i++)
+		newMatrix[i] = (int*)malloc(sizeof(int));
+
+	for (i = 0; i < matrixSize; i++)
+		for (j = 0; j < matrixSize; j++)
+			newMatrix[i][j] = matrix[i][j];
+
+	// Move '0' downwards
+	newMatrix[positionY][positionX] = newMatrix[positionY + 1][positionX];
+	newMatrix[positionY + 1][positionX] = 0;
+
+	return newMatrix;
+}
+
+int** MoveLeft(int **matrix) {
+	int **newMatrix;
+	int i, j;
+
+	// Need to create a copy of the parent matrix
+	newMatrix = (int**)malloc(matrixSize*sizeof(int*));
+	for (i = 0; i < matrixSize; i++)
+		newMatrix[i] = (int*)malloc(sizeof(int));
+
+	for (i = 0; i < matrixSize; i++)
+		for (j = 0; j < matrixSize; j++)
+			newMatrix[i][j] = matrix[i][j];
+
+	// Move '0' leftwards
+	newMatrix[positionY][positionX] = newMatrix[positionY][positionX - 1];
+	newMatrix[positionY][positionX - 1] = 0;
+
+	return newMatrix;
+}
+
+int** MoveRight(int **matrix) {
+	int **newMatrix;
+	int i, j;
+
+	// Need to create a copy of the parent matrix
+	newMatrix = (int**)malloc(matrixSize*sizeof(int*));
+	for (i = 0; i < matrixSize; i++)
+		newMatrix[i] = (int*)malloc(sizeof(int));
+
+	for (i = 0; i < matrixSize; i++)
+		for (j = 0; j < matrixSize; j++)
+			newMatrix[i][j] = matrix[i][j];
+
+	// Move '0' rightwards
+	newMatrix[positionY][positionX] = newMatrix[positionY][positionX + 1];
+	newMatrix[positionY][positionX + 1] = 0;
+
+	return newMatrix;
+}
+
+void ShowMatrix(int **matrix) {
+	int i, j;
+
+	for (i = 0; i < matrixSize; i++) {
+		for (j = 0; j < matrixSize; j++)
+		{
+			printf("%d | ", matrix[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+
+// Test Function
+int **CreateDesiredMatrix(int size) {
+	int **myMatrix;
+	int i, j;
+	int number = 1;
+
+	matrixSize = size;
+	myMatrix = (int**)malloc(size*sizeof(int*));
+
+
+	for (i = 0; i < size; i++)
+		myMatrix[i] = (int*)malloc(sizeof(int));
+
+	for (i = 0; i < size; i++) {
+		for (j = 0; j < size; j++) {
+			myMatrix[i][j] = number;
+			number++;
+		}
+	}
+
+	myMatrix[2][1] = 0;
+	myMatrix[2][2] = 8;
+
+	ShowMatrix(myMatrix);
+
+	return myMatrix;
 }
