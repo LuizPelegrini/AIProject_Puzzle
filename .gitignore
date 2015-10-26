@@ -1,6 +1,7 @@
 .vs/
 x64/
 Debug/
+AIProject_Puzzle/AIProject_Puzzle.vcxproj.user
 AIProject_Puzzle/x64/Debug/
 AIProject_Puzzle/Debug/
 *.sdf
