@@ -2,7 +2,9 @@
 #define MYMATRIX_H
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
+#include <math.h>
 
 int *numberArray;
 int arrayLength;
@@ -16,6 +18,7 @@ void InitiliazeNumberVector(int arraySize);
 int GetRandomNumber();
 void RemoveAt(int index);
 char* TurnMatrixIntoString(int **matrix);
+int TurnMatrixIntoInt(int **matrix);
 void FindZeroPosition(int **matrix);
 int CanMoveUp();
 int CanMoveDown();

@@ -11,8 +11,9 @@ int CreateQueue() {
 
 	myQueue->numberOfElements = 0;
 	myQueue->firstState = NULL;
+	myQueue->queueHead = NULL;
 
-	myMode = BFS;
+	myMode = DFS;
 
 	return 1;
 }
@@ -35,10 +36,11 @@ void Insert(State *state, Mode mode) {
 	
 	if (IsEmpty()) {
 		myQueue->firstState = state;
+		myQueue->queueHead = state;
 		myQueue->numberOfElements++;
 	}
 	else {
-		aux = myQueue->firstState;
+		aux = myQueue->queueHead;
 
 		switch (mode)
 		{
@@ -50,8 +52,12 @@ void Insert(State *state, Mode mode) {
 			aux->next = state;
 			myQueue->numberOfElements++;
 			break;
+
 			// Depth First Search
 		case 2:
+			state->next = aux->next;
+			aux->next = state;
+			myQueue->numberOfElements++;
 			break;
 		case 3:
 			break;
@@ -74,7 +80,8 @@ int CreateNewState(State *parent, Action action) {
 	{
 		newState->parent = NULL;
 		newState->matrix = CreateDesiredMatrix(3);
-		newState->matrixString = TurnMatrixIntoString(newState->matrix);
+		//newState->matrixString = TurnMatrixIntoString(newState->matrix);
+		newState->id = TurnMatrixIntoInt(newState->matrix);
 		newState->cost = 0;
 		newState->action = action;
 		newState->next = NULL;
@@ -87,44 +94,63 @@ int CreateNewState(State *parent, Action action) {
 		
 		switch (action) {
 			case UP:
-				newState->parent = parent;
-				newState->action = action;
-				newState->cost = parent->cost + 1;
 				newState->matrix = MoveUp(parent->matrix);
-				newState->matrixString = TurnMatrixIntoString(newState->matrix);
-				newState->next = NULL;
+				newState->id = TurnMatrixIntoInt(newState->matrix);
+				//newState->matrixString = TurnMatrixIntoString(newState->matrix);
+				if (!IsInTheQueue(newState)) {
+					newState->parent = parent;
+					newState->action = action;
+					newState->cost = parent->cost + 1;
+					
+					newState->next = NULL;
 
-				Insert(newState, myMode);
+					Insert(newState, myMode);
+				}else
+					free(newState);
 				break;
 			case DOWN:
-				newState->parent = parent;
-				newState->action = action;
-				newState->cost = parent->cost + 1;
 				newState->matrix = MoveDown(parent->matrix);
-				newState->matrixString = TurnMatrixIntoString(newState->matrix);
-				newState->next = NULL;
+				newState->id = TurnMatrixIntoInt(newState->matrix);
+				//newState->matrixString = TurnMatrixIntoString(newState->matrix);
+				if (!IsInTheQueue(newState)) {
+					newState->parent = parent;
+					newState->action = action;
+					newState->cost = parent->cost + 1;
+					
+					newState->next = NULL;
 
-				Insert(newState, myMode);
+					Insert(newState, myMode);
+				}else
+					free(newState);
 				break;
 			case LEFT:
-				newState->parent = parent;
-				newState->action = action;
-				newState->cost = parent->cost + 1;
 				newState->matrix = MoveLeft(parent->matrix);
-				newState->matrixString = TurnMatrixIntoString(newState->matrix);
-				newState->next = NULL;
+				newState->id = TurnMatrixIntoInt(newState->matrix);
+				//newState->matrixString = TurnMatrixIntoString(newState->matrix);
+				if (!IsInTheQueue(newState)) {
+					newState->parent = parent;
+					newState->action = action;
+					newState->cost = parent->cost + 1;
+					
+					newState->next = NULL;
 
-				Insert(newState, myMode);
+					Insert(newState, myMode);
+				}else
+					free(newState);
 				break;
 			case RIGHT:
-				newState->parent = parent;
-				newState->action = action;
-				newState->cost = parent->cost + 1;
 				newState->matrix = MoveRight(parent->matrix);
-				newState->matrixString = TurnMatrixIntoString(newState->matrix);
-				newState->next = NULL;
+				newState->id = TurnMatrixIntoInt(newState->matrix);
+				//newState->matrixString = TurnMatrixIntoString(newState->matrix);
+				if (!IsInTheQueue(newState)) {
+					newState->parent = parent;
+					newState->action = action;
+					newState->cost = parent->cost + 1;
+					newState->next = NULL;
 
-				Insert(newState, myMode);
+					Insert(newState, myMode);
+				}else
+					free(newState);
 				break;
 			default:
 				printf("%s\n", "INVALID ACTION!");
@@ -139,7 +165,7 @@ int CreateNewState(State *parent, Action action) {
 int Pop() {
 	State *currentState;
 
-	currentState = myQueue->firstState;
+	currentState = myQueue->queueHead;
 	
 	if (IsEmpty()) {
 		printf("%s", "The queue is empty, Pop operation cannot be done!");
@@ -164,17 +190,17 @@ int Pop() {
 			CreateNewState(currentState, DOWN);
 		}
 		if (CanMoveLeft()) {
-			CreateNewState(currentState, DOWN);
+			CreateNewState(currentState, LEFT);
 		}
 		if (CanMoveRight()) {
-			CreateNewState(currentState, DOWN);
+			CreateNewState(currentState, RIGHT);
 		}
 	}
 
 	// Take out from the queue
 	// Move the queue first state to the next element
 	// Decrement one state of the queue, but we need to store it once we need to show the actions taken, at the end
-	myQueue->firstState = myQueue->firstState->next;
+	myQueue->queueHead = myQueue->queueHead->next;
 	myQueue->numberOfElements--;
 
 	// free(currentState);
@@ -183,25 +209,62 @@ int Pop() {
 }
 
 int IsFinalState(State *state) {
-	if (!strcmp(state->matrixString, finalState.matrixString))
+	/*if (!strcmp(state->matrixString, finalState.matrixString))
+		return 1;
+	return 0;*/
+
+	if (state->id == finalState.id)
 		return 1;
 	return 0;
 }
 
+int IsInTheQueue(State *state) {
+	State *aux;
+	aux = myQueue->firstState;
+
+	do {
+		if (aux->id == state->id)
+			return 1;
+		aux = aux->next;
+	} while (aux != NULL);
+
+	/*while (aux->next != NULL) {
+		if (!strcmp(aux->matrixString, state->matrixString))
+			return 1;
+		aux = aux->next;
+	}*/
+
+	return 0;
+}
 
 // Check this for later setup <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void SetFinalState(){
 	finalState.action = NONE;
 	finalState.cost = -1;
-	finalState.matrixString = "123456780";
+	/*finalState.matrixString = "12345678910111213141516";*/
+	finalState.id = 123456780;
 }
 
 void ShowResults(){
 	State *aux;
-	aux = myQueue->firstState;
+	aux = myQueue->queueHead;
 
 	while (aux->parent != NULL) {
-		printf("Action taken: %d\n", aux->action);
+		switch (aux->action)
+		{
+		case UP:
+			printf("Action taken: %s\n", "UP");
+			break;
+		case DOWN:
+			printf("Action taken: %s\n", "DOWN");
+			break;
+		case LEFT:
+			printf("Action taken: %s\n", "LEFT");
+			break;
+		case RIGHT:
+			printf("Action taken: %s\n", "RIGHT");
+			break;
+		}
 		aux = aux->parent;
 	}
 }
