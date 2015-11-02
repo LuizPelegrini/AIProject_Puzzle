@@ -13,7 +13,7 @@ int CreateQueue() {
 	myQueue->firstState = NULL;
 	myQueue->queueHead = NULL;
 
-	myMode = DFS;
+	myMode = GREEDY;
 
 	return 1;
 }
@@ -23,6 +23,21 @@ int CreateFirstState() {
 	if (!CreateNewState(NULL, NONE))
 		return 0;
 	return 1;
+}
+
+void CreateHashTable() {
+	int i, j, k = 0;
+
+	positions = (Position*)malloc(10 * sizeof(Position));
+
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) {
+			positions[k].num = k + 1;
+			positions[k].i = i;
+			positions[k].j = j;
+			k++;
+		}
+	}
 }
 
 int IsEmpty() {
@@ -35,6 +50,7 @@ void Insert(State *state, Mode mode) {
 	State *aux;
 	
 	if (IsEmpty()) {
+		state->value = CalculateValue(state);
 		myQueue->firstState = state;
 		myQueue->queueHead = state;
 		myQueue->numberOfElements++;
@@ -59,7 +75,16 @@ void Insert(State *state, Mode mode) {
 			aux->next = state;
 			myQueue->numberOfElements++;
 			break;
+
+			// Greedy best-first search
 		case 3:
+			state->value = CalculateValue(state);
+			while ((aux->next != NULL) && (aux->next->value <= state->value)) {
+				aux = aux->next;
+			}
+			state->next = aux->next;
+			aux->next = state;
+			myQueue->numberOfElements++;
 			break;
 		case 4:
 			break;
@@ -80,7 +105,6 @@ int CreateNewState(State *parent, Action action) {
 	{
 		newState->parent = NULL;
 		newState->matrix = CreateDesiredMatrix(3);
-		//newState->matrixString = TurnMatrixIntoString(newState->matrix);
 		newState->id = TurnMatrixIntoInt(newState->matrix);
 		newState->cost = 0;
 		newState->action = action;
@@ -96,7 +120,6 @@ int CreateNewState(State *parent, Action action) {
 			case UP:
 				newState->matrix = MoveUp(parent->matrix);
 				newState->id = TurnMatrixIntoInt(newState->matrix);
-				//newState->matrixString = TurnMatrixIntoString(newState->matrix);
 				if (!IsInTheQueue(newState)) {
 					newState->parent = parent;
 					newState->action = action;
@@ -111,7 +134,6 @@ int CreateNewState(State *parent, Action action) {
 			case DOWN:
 				newState->matrix = MoveDown(parent->matrix);
 				newState->id = TurnMatrixIntoInt(newState->matrix);
-				//newState->matrixString = TurnMatrixIntoString(newState->matrix);
 				if (!IsInTheQueue(newState)) {
 					newState->parent = parent;
 					newState->action = action;
@@ -141,7 +163,6 @@ int CreateNewState(State *parent, Action action) {
 			case RIGHT:
 				newState->matrix = MoveRight(parent->matrix);
 				newState->id = TurnMatrixIntoInt(newState->matrix);
-				//newState->matrixString = TurnMatrixIntoString(newState->matrix);
 				if (!IsInTheQueue(newState)) {
 					newState->parent = parent;
 					newState->action = action;
@@ -179,7 +200,7 @@ int Pop() {
 	}
 	else {
 
-		// Find the position where the number zero is
+		// Find the position where the number zero of the current matrix is
 		FindZeroPosition(currentState->matrix);
 
 		// Is it possible to change the numbers within the matrix?
@@ -228,20 +249,118 @@ int IsInTheQueue(State *state) {
 		aux = aux->next;
 	} while (aux != NULL);
 
-	/*while (aux->next != NULL) {
-		if (!strcmp(aux->matrixString, state->matrixString))
-			return 1;
-		aux = aux->next;
-	}*/
-
 	return 0;
 }
+
+// How far the state is from the goal?
+int CalculateValue(State *state) {
+	int i, j;
+	int total = 0;
+
+	for (i = 0; i < matrixSize; i++) {
+		for (j = 0; j < matrixSize; j++) {
+			if(!IsOnPlace(state->matrix[i][j], i, j)){
+				total += DistanceValue(state->matrix[i][j], i, j);
+			}
+		}
+	}
+
+	return total;
+}
+
+int DistanceValue(int num, int i, int j) {
+	int temp = 0;
+	int tempi = i;
+	int tempj = j;
+	int index;
+
+	if (num != 0)
+		index = num - 1;
+	else
+		index = 8;
+
+
+	// ***** Position i ******
+	if (positions[index].i > i) {
+		do {
+			temp++;
+			tempi++;
+		} while (positions[index].i > tempi);
+	}
+	else {
+		while (positions[index].i < tempi) {
+			temp++;
+			tempi--;
+		}
+	}
+	
+
+	// ******* Position j *******
+	if (positions[index].j > j) {
+		do {
+			temp++;
+			tempj++;
+		} while (positions[index].j > tempj);
+	}
+	else {
+		while (positions[index].j < tempj) {
+			temp++;
+			tempj--;
+		}
+	}
+
+	return temp;
+}
+
+int IsOnPlace(int num, int i, int j) {
+	int index;
+
+	if (num != 0)
+		index = num - 1;
+	else
+		index = 8;
+
+	if (positions[index].i == i && positions[index].j == j)
+		return 1;
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Check this for later setup <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void SetFinalState(){
 	finalState.action = NONE;
 	finalState.cost = -1;
-	/*finalState.matrixString = "12345678910111213141516";*/
 	finalState.id = 123456780;
 }
 

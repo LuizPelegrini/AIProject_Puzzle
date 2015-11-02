@@ -6,21 +6,27 @@
 #include "MyMatrix.h"
 
 typedef enum mode{
-	BFS = 1, DFS
+	BFS = 1, DFS, GREEDY
 }Mode;
 
 typedef enum action {
 	NONE = 1, RIGHT, LEFT, UP, DOWN
 }Action;
 
+typedef struct hashTablePosition {
+	int num;
+	int i;
+	int j;
+}Position;
+
 typedef struct state {
 	int **matrix;
 	int id;
-	/*char *matrixString;*/
 	Action action;
 	struct state *parent;
 	struct state *next;
 	int cost;
+	int value;
 }State;
 
 typedef struct queue {
@@ -30,6 +36,7 @@ typedef struct queue {
 }Queue;
 
 Queue *myQueue;
+Position *positions;
 Mode myMode;
 State finalState;
 
@@ -44,4 +51,8 @@ int IsFinalState(State *state);
 int IsInTheQueue(State *state);
 void SetFinalState();
 void ShowResults();
+void CreateHashTable();
+int CalculateValue(State *state);
+int DistanceValue(int num, int i, int j);
+int IsOnPlace(int num, int i, int j);
 #endif
