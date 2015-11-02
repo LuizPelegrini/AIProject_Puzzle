@@ -4,8 +4,11 @@
 
 int main() {
 	int found;
+	
 	CreateQueue();
+	CreateHashTable();
 	CreateFirstState();
+	
 
 	do {
 		found = Pop();
